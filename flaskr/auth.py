@@ -17,7 +17,7 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        db = get_db
+        db = get_db()
 
         db.execute(
             'INSERT INTO user (username, password) VALUES (?, ?)',
