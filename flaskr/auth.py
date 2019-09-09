@@ -25,6 +25,10 @@ def register():
             error = 'Username is required'
         elif not password:
             error = 'Password is required'
+        elif db.execute(
+            'SELECT id FROM user WHERE username = ?', (username,)
+        ).fetchone() is not None:
+            error = 'Username {} is already registered.'.format(username)
 
         if error is None:
             db.execute(
