@@ -30,6 +30,11 @@ FLASK_APP=flaskr
 FLASK_ENV=development
 ```
 
+Initialize the database:
+```bash
+$ flask init-db
+```
+
 ## Run
 
 ```bash
