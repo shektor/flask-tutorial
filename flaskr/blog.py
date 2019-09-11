@@ -1,11 +1,29 @@
 from flask import (
     Blueprint,
-    render_template
+    g,
+    redirect,
+    render_template,
+    request,
+    url_for,
 )
+from flaskr.db import get_db
 
 bp = Blueprint('blog', __name__)
 
 
-@bp.route('/create')
+@bp.route('/create', methods=('GET', 'POST'))
 def create():
+    if request.method == 'POST':
+        title = request.form['title']
+        body = request.form['body']
+        author_id = g.user['id']
+        db = get_db()
+
+        db.execute(
+            'INSERT INTO post (title, body, author_id)'
+            ' VALUES (?, ?, ?)', (title, body, author_id)
+        )
+        db.commit()
+        return redirect(url_for('index'))
+
     return render_template('blog/create.html')
