@@ -51,13 +51,33 @@ def index():
     return render_template('blog/index.html', posts=posts)
 
 
-@bp.route('/<int:id>/update')
+@bp.route('/<int:id>/update', methods=('GET', 'POST'))
 @login_required
 def update(id):
+    if request.method == 'POST':
+        title = request.form['title']
+        body = request.form['body']
+        error = None
+
+        if not title:
+            error = 'Title is required.'
+
+        if error is not None:
+            flash(error)
+        else:
+            db = get_db()
+            db.execute(
+                'UPDATE post SET title = ?, body = ?'
+                ' WHERE id = ?',
+                (title, body, id)
+            )
+            db.commit()
+            return redirect(url_for('blog.index'))
+
     post = get_db().execute(
         'SELECT p.id, title, body, created, author_id, username'
         ' FROM post p JOIN user u ON p.author_id = u.id'
-        ' WHERE p.id = ?', 
+        ' WHERE p.id = ?',
         (id,)
     ).fetchone()
 
