@@ -7,6 +7,7 @@ from flask import (
     request,
     url_for,
 )
+from wekzeug.exceptions import abort
 
 from flaskr.auth import login_required
 from flaskr.db import get_db
@@ -54,6 +55,19 @@ def index():
 @bp.route('/<int:id>/update', methods=('GET', 'POST'))
 @login_required
 def update(id):
+    post = get_db().execute(
+        'SELECT p.id, title, body, created, author_id, username'
+        ' FROM post p JOIN user u ON p.author_id = u.id'
+        ' WHERE p.id = ?',
+        (id,)
+    ).fetchone()
+
+    if post is None:
+        abort(404, "Post id {0} does not exist.".format(id))
+
+    if post['author_id'] != g.user['id']:
+        abort(403)
+
     if request.method == 'POST':
         title = request.form['title']
         body = request.form['body']
@@ -73,12 +87,5 @@ def update(id):
             )
             db.commit()
             return redirect(url_for('blog.index'))
-
-    post = get_db().execute(
-        'SELECT p.id, title, body, created, author_id, username'
-        ' FROM post p JOIN user u ON p.author_id = u.id'
-        ' WHERE p.id = ?',
-        (id,)
-    ).fetchone()
 
     return render_template('blog/update.html', post=post)
