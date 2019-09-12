@@ -7,7 +7,7 @@ from flask import (
     request,
     url_for,
 )
-from wekzeug.exceptions import abort
+from werkzeug.exceptions import abort
 
 from flaskr.auth import login_required
 from flaskr.db import get_db
