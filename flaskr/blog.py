@@ -49,3 +49,16 @@ def index():
         ' ORDER BY created DESC'
     ).fetchall()
     return render_template('blog/index.html', posts=posts)
+
+
+@bp.route('/<int:id>/update')
+@login_required
+def update(id):
+    post = get_db().execute(
+        'SELECT p.id, title, body, created, author_id, username'
+        ' FROM post p JOIN user u ON p.author_id = u.id'
+        ' WHERE p.id = ?', 
+        (id,)
+    ).fetchone()
+
+    return render_template('blog/update.html', post=post)
